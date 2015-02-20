@@ -40,10 +40,31 @@ RUN \
 # accept the eula
 RUN \
   echo "eula=true" > ${MINECRAFT_DIR}/eula.txt
+  
+# look into this 
+# RUN rm -rf /var/lib/apt/lists/*
 
+# ADD http://fyreuk.tehbanana.com/Remnant_FYREUK_HungerGamesMap.zip ${MINECRAFT_DIR}/remnant
+RUN \
+  apt-get install -y curl unzip && \
+  curl http://fyreuk.tehbanana.com/Remnant_FYREUK_HungerGamesMap.zip -o temp.zip && \
+  unzip temp.zip -d ${MINECRAFT_DIR}/remnant && \
+  rm temp.zip
+
+ADD http://dev.bukkit.org/media/files/773/95/remotebukkitplugin-4.0.0.jar ${MINECRAFT_DIR}/plugins/
+ADD http://dev.bukkit.org/media/files/588/781/Multiverse-Core-2.4.jar ${MINECRAFT_DIR}/plugins/
+
+ADD ./minecraft.sh /opt/minecraft/
+ADD ./server.properties /opt/minecraft/
 
 WORKDIR ${MINECRAFT_DIR}
 
 EXPOSE 25565
+EXPOSE 25564
 
-CMD ${JAVA_HOME}/bin/java -Xms512M -Xmx512M -XX:MaxPermSize=128M -jar spigot-*.jar
+ENV SERVER_USER mine_ops
+ENV SERVER_PASS password
+
+ENTRYPOINT /opt/minecraft/minecraft.sh
+
+CMD minecraft
