@@ -1,7 +1,15 @@
 #!/bin/sh
 
-mkdir -p ${MINECRAFT_DIR}/plugins/RemoteBukkit/
+# unpack worlds if this is the first time they have been installed
+for world in $( find ${DEFAULT_WORLDS_DIR} -name "*.zip" ); do
+    world_name=$(basename "${world%.*}")
+	if [ ! -d ${MINECRAFT_DIR}/${world_name} ]; then
+		unzip ${world} -d ${MINECRAFT_DIR}/${world_name}
+	fi	
+done
 
+
+mkdir -p ${MINECRAFT_DIR}/plugins/RemoteBukkit/
 cat > ${MINECRAFT_DIR}/plugins/RemoteBukkit/config.yml<<EOF
 port: 25564
 verbose: true

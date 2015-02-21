@@ -44,18 +44,26 @@ RUN \
 # look into this 
 # RUN rm -rf /var/lib/apt/lists/*
 
-# ADD http://fyreuk.tehbanana.com/Remnant_FYREUK_HungerGamesMap.zip ${MINECRAFT_DIR}/remnant
-RUN \
-  apt-get install -y curl unzip && \
-  curl http://fyreuk.tehbanana.com/Remnant_FYREUK_HungerGamesMap.zip -o temp.zip && \
-  unzip temp.zip -d ${MINECRAFT_DIR}/remnant && \
-  rm temp.zip
 
-ADD http://dev.bukkit.org/media/files/773/95/remotebukkitplugin-4.0.0.jar ${MINECRAFT_DIR}/plugins/
-ADD http://dev.bukkit.org/media/files/588/781/Multiverse-Core-2.4.jar ${MINECRAFT_DIR}/plugins/
+RUN  apt-get install -y curl unzip
+
+# setup worlds
+ENV DEFAULT_WORLDS_DIR ${MINECRAFT_DIR}/maps/
+RUN mkdir ${DEFAULT_WORLDS_DIR}
+
+RUN curl http://fyreuk.tehbanana.com/Remnant_FYREUK_HungerGamesMap.zip -o ${DEFAULT_WORLDS_DIR}/remnant.zip
+RUN curl http://minecraft.egmont.co.uk/downloads/Stolen%20Treasure.zip -o ${DEFAULT_WORLDS_DIR}/maze.zip
+
+RUN mkdir ${MINECRAFT_DIR}/plugins
+RUN curl -L http://dev.bukkit.org/media/files/773/95/remotebukkitplugin-4.0.0.jar -o ${MINECRAFT_DIR}/plugins/remotebukkitplugin-4.0.0.jar
+RUN curl -L http://dev.bukkit.org/media/files/588/781/Multiverse-Core-2.4.jar -o ${MINECRAFT_DIR}/plugins/Multiverse-Core-2.4.jar
 
 ADD ./minecraft.sh /opt/minecraft/
 ADD ./server.properties /opt/minecraft/
+ADD ./worlds.yml /opt/minecraft/plugins/Multiverse-Core/
+
+VOLUME ${MINECRAFT_DIR}/remnant
+VOLUME ${MINECRAFT_DIR}/maze
 
 WORKDIR ${MINECRAFT_DIR}
 
